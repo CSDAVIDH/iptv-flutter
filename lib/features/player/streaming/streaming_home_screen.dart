@@ -30,10 +30,37 @@ class _StreamingHomeScreenState extends State<StreamingHomeScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text('Error al cargar canales'),
+                  const SizedBox(height: 8),
+                  Text(
+                    snapshot.error.toString(),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _channelsFuture = StreamingController().getChannels(widget.m3uUrl);
+                      });
+                    },
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
             return const Center(child: Text('No se encontraron canales'));
           }
           final channels = snapshot.data!;
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return ListView.builder(
             itemCount: channels.length,
             itemBuilder: (context, index) {

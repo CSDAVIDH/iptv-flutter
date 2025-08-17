@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:iptv/features/player/streaming/streaming_home_screen.dart';
+import '../../player/streaming/streaming_home_screen.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/constants.dart'; // playlistUrl
 

@@ -76,7 +76,7 @@ class _StreamingScreenState extends State<StreamingScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _vlcController.value.errorDescription,
+                        _vlcController.value.errorDescription ?? 'Error desconocido',
                         style: const TextStyle(color: Colors.redAccent),
                         textAlign: TextAlign.center,
                       ),
