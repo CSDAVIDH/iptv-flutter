@@ -7,8 +7,8 @@ class SubscriptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      appBar: CustomAppBar(title: 'IPTV Player'),
-      body: Center(child: Text('Bienvenido a Player')),
+      appBar: CustomAppBar(title: 'Suscripción'),
+      body: Center(child: Text('Pantalla de Suscripción')),
     );
   }
 }
