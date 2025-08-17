@@ -5,6 +5,6 @@ class StreamingController {
   final M3uService _service = M3uService();
 
   Future<List<Channel>> getChannels(String m3uUrl) {
-    return _service.fetchChannels(m3uUrl);
+    return _service.loadChannelsFromM3U(m3uUrl);
   }
 }

@@ -10,14 +10,10 @@ class StreamingScreen extends StatefulWidget {
 }
 
 class _StreamingScreenState extends State<StreamingScreen> {
-  late VlcPlayerController _vlcController;
-  bool _isLoading = true;
+  VlcPlayerController? _vlcController;
   bool _isError = false;
 
-  @override
-  void initState() {
-    super.initState();
-
+  Future<void> _initController() async {
     _vlcController = VlcPlayerController.network(
       widget.url,
       hwAcc: HwAcc.auto,
@@ -25,33 +21,26 @@ class _StreamingScreenState extends State<StreamingScreen> {
       options: VlcPlayerOptions(),
     );
 
-    _vlcController.addListener(() {
-      final isPlaying = _vlcController.value.isPlaying;
-      final hasError = _vlcController.value.hasError;
-
-      if (hasError) {
+    _vlcController!.addListener(() {
+      final hasError = _vlcController!.value.hasError;
+      if (hasError && !_isError) {
         setState(() {
           _isError = true;
-          _isLoading = false;
-        });
-      } else if (isPlaying) {
-        setState(() {
-          _isLoading = false;
         });
       }
     });
+
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   @override
   void dispose() {
     try {
-      if (_vlcController.value.isInitialized) {
-        _vlcController.stop();
-        _vlcController.dispose();
+      if (_vlcController != null && _vlcController!.value.isInitialized) {
+        _vlcController!.stop();
+        _vlcController!.dispose();
       }
-    } catch (_) {
-      // Ignorar si no está inicializado
-    }
+    } catch (_) {}
     super.dispose();
   }
 
@@ -63,39 +52,46 @@ class _StreamingScreenState extends State<StreamingScreen> {
         backgroundColor: Colors.black87,
       ),
       backgroundColor: Colors.black,
-      body: Center(
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : _isError
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'canal no disponible',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _vlcController.value.errorDescription,
-                        style: const TextStyle(color: Colors.redAccent),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  )
-                : VlcPlayer(
-                    controller: _vlcController,
-                    aspectRatio: 16 / 9,
-                    placeholder: Image.network(
-                      'https://awtv.com.br/wp-content/uploads/2024/10/LOGO-AWTV-1080X1080-300x300.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          'assets/images/placeholder.png',
-                          fit: BoxFit.contain,
-                        );
-                      },
-                    ),
+      body: FutureBuilder(
+        future: _initController(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (_isError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'canal no disponible',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _vlcController?.value.errorDescription ?? '',
+                    style: const TextStyle(color: Colors.redAccent),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          }
+          return VlcPlayer(
+            controller: _vlcController!,
+            aspectRatio: 16 / 9,
+            placeholder: Image.network(
+              'https://awtv.com.br/wp-content/uploads/2024/10/LOGO-AWTV-1080X1080-300x300.png',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/images/placeholder.png',
+                  fit: BoxFit.contain,
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }

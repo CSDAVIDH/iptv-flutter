@@ -21,7 +21,9 @@ class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
     home: (context) => const HomeScreen(),
     login: (context) => const LoginScreen(),
-    catalog: (context) => const CatalogScreen(),
+    catalog: (context) => const CatalogScreen(
+          m3uUrl: '',
+        ),
     player: (context) => const PlayerScreen(),
     subscription: (context) => const SubscriptionScreen(),
     profile: (context) => const ProfileScreen(),

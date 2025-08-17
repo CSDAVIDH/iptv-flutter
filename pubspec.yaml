@@ -32,7 +32,7 @@ dependencies:
     sdk: flutter
   logger: ^2.3.0
   cupertino_icons: ^1.0.8
-  http: ^1.1.0
+  http: ^1.2.0
   video_player: ^2.6.0
   chewie: ^1.7.1
   flutter_vlc_player: 7.4.3

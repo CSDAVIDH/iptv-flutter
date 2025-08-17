@@ -1,1 +1,2 @@
-const String playlistUrl = "https://iptv-org.github.io/iptv/countries/br.m3u";
+const String playlistUrl =
+    "https://raw.githubusercontent.com/helenfernanda/gratis/main/iptvlegal.m3u";
