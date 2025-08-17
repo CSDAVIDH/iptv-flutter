@@ -36,6 +36,7 @@ dependencies:
   video_player: ^2.6.0
   chewie: ^1.7.1
   flutter_vlc_player: 7.4.3
+  shared_preferences: ^2.2.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

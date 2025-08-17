@@ -11,7 +11,7 @@ class CatalogScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Catálogo')),
       body: FutureBuilder<List<Channel>>(
-        future: loadChannelsFromM3U(m3uUrl),
+        future: M3uService().fetchChannels(m3uUrl),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
