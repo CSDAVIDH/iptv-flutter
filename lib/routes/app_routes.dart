@@ -8,6 +8,7 @@ import '../features/player/presentation/player_screen.dart';
 import '../features/subscription/presentation/subscription_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/favorites/presentation/favorites_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -17,6 +18,7 @@ class AppRoutes {
   static const String subscription = '/subscription';
   static const String profile = '/profile';
   static const String settings = '/settings';
+  static const String favorites = '/favorites';
 
   static final Map<String, WidgetBuilder> routes = {
     home: (context) => const HomeScreen(),
@@ -26,5 +28,6 @@ class AppRoutes {
     subscription: (context) => const SubscriptionScreen(),
     profile: (context) => const ProfileScreen(),
     settings: (context) => const SettingsScreen(),
+    favorites: (context) => const FavoritesScreen(),
   };
 }

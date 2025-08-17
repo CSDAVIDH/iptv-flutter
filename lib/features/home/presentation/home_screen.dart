@@ -246,9 +246,7 @@ class HomeScreen extends StatelessWidget {
                 Icons.favorite,
                 Colors.red,
                 () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Favoritos próximamente")),
-                  );
+                  Navigator.pushNamed(context, '/favorites');
                 },
               ),
               _buildQuickAccessCard(

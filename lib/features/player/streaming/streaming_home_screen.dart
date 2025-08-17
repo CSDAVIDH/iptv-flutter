@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/channel.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/services/favorites_service.dart';
 import 'streaming_controller.dart';
 import 'streaming_screen.dart';
 
@@ -244,76 +245,125 @@ class _StreamingHomeScreenState extends State<StreamingHomeScreen> {
             width: 1,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            // Channel logo/thumbnail
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                ),
-                child: channel.logo != null && channel.logo!.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                        child: Image.network(
-                          channel.logo!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Channel logo/thumbnail
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: channel.logo != null && channel.logo!.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            child: Image.network(
+                              channel.logo!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.tv,
+                                size: 32,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          )
+                        : Icon(
                             Icons.tv,
                             size: 32,
                             color: AppColors.textSecondary,
                           ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.tv,
-                        size: 32,
-                        color: AppColors.textSecondary,
-                      ),
-              ),
-            ),
-            // Channel info
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      channel.name,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (channel.group != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        channel.group!,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 10,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
+                // Channel info
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          channel.name,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (channel.group != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            channel.group!,
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Favorite button
+            Positioned(
+              top: 8,
+              right: 8,
+              child: FutureBuilder<bool>(
+                future: FavoritesService.isFavorite(channel),
+                builder: (context, snapshot) {
+                  final isFavorite = snapshot.data ?? false;
+                  return InkWell(
+                    onTap: () async {
+                      await FavoritesService.toggleFavorite(channel);
+                      setState(() {}); // Refresh the UI
+                      
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isFavorite 
+                                  ? '${channel.name} eliminado de favoritos'
+                                  : '${channel.name} agregado a favoritos',
+                            ),
+                            backgroundColor: AppColors.surface,
+                          ),
+                        );
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isFavorite 
+                            ? AppColors.accent
+                            : Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -375,9 +425,48 @@ class _StreamingHomeScreenState extends State<StreamingHomeScreen> {
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: Icon(
-          Icons.play_arrow,
-          color: AppColors.secondary,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FutureBuilder<bool>(
+              future: FavoritesService.isFavorite(channel),
+              builder: (context, snapshot) {
+                final isFavorite = snapshot.data ?? false;
+                return InkWell(
+                  onTap: () async {
+                    await FavoritesService.toggleFavorite(channel);
+                    setState(() {}); // Refresh the UI
+                    
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isFavorite 
+                                ? '${channel.name} eliminado de favoritos'
+                                : '${channel.name} agregado a favoritos',
+                          ),
+                          backgroundColor: AppColors.surface,
+                        ),
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? AppColors.accent : AppColors.textSecondary,
+                      size: 20,
+                    ),
+                  ),
+                );
+              },
+            ),
+            Icon(
+              Icons.play_arrow,
+              color: AppColors.secondary,
+            ),
+          ],
         ),
         onTap: () {
           Navigator.push(
