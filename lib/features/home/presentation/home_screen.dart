@@ -255,9 +255,7 @@ class HomeScreen extends StatelessWidget {
                 Icons.search,
                 Colors.orange,
                 () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Búsqueda próximamente")),
-                  );
+                  Navigator.pushNamed(context, '/search');
                 },
               ),
             ],
